@@ -4,14 +4,14 @@ with open("README.md", "r", encoding="utf-8") as fh:
     long_description = fh.read()
 
 setup(
-    name="pipsave",
+    name="pipit",
     version="0.1.0",
     author="ADIL ALAMI",
     author_email="adilalami707@gmail.com",
     description="A tool to install and save clean package dependencies",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://github.com/Aeidle/pipsave",
+    url="https://github.com/Aeidle/pipit",
     packages=find_packages(),
     classifiers=[
         "Programming Language :: Python :: 3",
@@ -24,7 +24,7 @@ setup(
     ],
     entry_points={
         "console_scripts": [
-            "pipsave=pipsave.cli:main",
+            "pipit=pipit.cli:main",
         ],
     },
 )
