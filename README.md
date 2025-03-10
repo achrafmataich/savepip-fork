@@ -1,29 +1,29 @@
-# PipIt
+# SavePip
 
 A tool to install and save clean package dependencies for both pip and conda environments.
 
 ## Installation
 
 ```bash
-pip install pipit
+pip install savepip
 ```
 
 ## Usage
 ```bash
 # Install packages with pip
-pipit install pandas numpy
+savepip install pandas numpy
 
 # Install packages with conda
-pipit -m conda numpy pandas
+savepip -m conda numpy pandas
 
 # Save current environment
-pipit save
+savepip save
 
 # Upgrade packages
-pipit -u requests pandas
+savepip -u requests pandas
 
 # Save to custom file
-pipit -o custom_requirements.txt requests pandas
+savepip -o custom_requirements.txt requests pandas
  ```
 
 ## Features
