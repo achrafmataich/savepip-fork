@@ -6,13 +6,15 @@ import sys
 import json
 import re
 from datetime import datetime
+from .memory_manager import MemoryManager
 
 
 class DependencySaver:
-    def __init__(self, output_file=None, manager="pip"):
+    def __init__(self, output_file=None, manager="pip", memory_manager=None):
         self.manager = manager.lower()
         self.output_file = output_file or self._get_default_output_file()
         self.packages = []  # Add this line to store packages
+        self.memory_manager = memory_manager or MemoryManager()
 
     def _get_default_output_file(self):
         if self.manager == "pip":
@@ -35,6 +37,8 @@ class DependencySaver:
             return False
             
         # Save dependencies
+        for package in packages:
+            self.memory_manager.add_dependency(package)
         return self._save_dependencies(dev)
 
     def _install_packages(self, packages, upgrade=False):
@@ -61,29 +65,27 @@ class DependencySaver:
             print(f"Error installing packages: {e}")
             return False
     
-    def _save_dependencies(self, dev=False):
+    def _save_dependencies(self, dev=False, categories=None):
         """Save dependencies to file"""
         try:
             if self.manager == "pip":
-                # Get list of all installed packages for save-only mode
-                if not self.packages:
-                    cmd = [sys.executable, "-m", "pip", "list", "--format=json"]
-                    result = subprocess.run(cmd, capture_output=True, text=True, check=True)
-                    packages_json = json.loads(result.stdout)
-                    self.packages = [pkg["name"] for pkg in packages_json]
-                
-                return self._save_pip_dependencies(dev)
+                target_packages = {pkg.lower() for pkg in self.memory_manager.get_dependencies(categories)}
+                return self._save_pip_dependencies(dev, target_packages)
             elif self.manager == "conda":
-                return self._save_conda_dependencies()
+                return self._save_conda_dependencies(categories)
             else:
                 raise ValueError(f"Unsupported package manager: {self.manager}")
         except Exception as e:
             print(f"Error saving dependencies: {e}")
             return False
     
-    def _save_pip_dependencies(self, dev=False):
+    def _save_pip_dependencies(self, dev=False, target_packages=None):
         """Save pip dependencies to requirements.txt"""
         try:
+            # Delete the previous requirements.txt if it exists
+            if os.path.exists(self.output_file):
+                os.remove(self.output_file)
+
             # Load existing requirements if file exists
             existing_packages = set()
             if os.path.exists(self.output_file):
@@ -100,8 +102,6 @@ class DependencySaver:
             
             # Clean up the requirements
             cleaned_requirements = []
-            # Convert packages list to lowercase for case-insensitive comparison
-            target_packages = {pkg.lower() for pkg in self.packages}
             
             for req in requirements:
                 # Get package name (everything before ==)
@@ -112,6 +112,9 @@ class DependencySaver:
                     # Remove version specifiers like +dev, etc.
                     req = re.sub(r'(==\d+\.\d+\.\d+)\+.*', r'\1', req)
                     cleaned_requirements.append(req)
+            
+            # Remove duplicates
+            cleaned_requirements = list(set(cleaned_requirements))
             
             # Sort requirements alphabetically
             cleaned_requirements.sort(key=lambda x: x.lower())
@@ -131,7 +134,7 @@ class DependencySaver:
             print(f"Error saving pip dependencies: {e}")
             return False
     
-    def _save_conda_dependencies(self):
+    def _save_conda_dependencies(self, categories=None):
         try:
             # Load existing environment if file exists
             existing_deps = set()
@@ -163,7 +166,7 @@ class DependencySaver:
             }
             
             # Convert packages list to lowercase for case-insensitive comparison
-            target_packages = {pkg.lower() for pkg in self.packages}
+            target_packages = {pkg.lower() for pkg in self.memory_manager.get_dependencies(categories)}
             
             if 'dependencies' in env_dict:
                 for dep in env_dict['dependencies']:
