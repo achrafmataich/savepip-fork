@@ -58,3 +58,18 @@ savepip ls-categories
 - Sorts dependencies alphabetically
 - Removes build hashes and unnecessary information
 - Categorize and save only the required high-level packages
+
+## Contributors
+
+Thanks to all the people who have contributed to this project:
+
+<!-- prettier-ignore-start -->
+<!-- markdownlint-disable -->
+<table>
+    <tr>
+        <td align="center"><a href="https://github.com/Aeidle"><img src="https://avatars.githubusercontent.com/u/72752236?v=4" width="50;" style="border-radius: 25px;" alt=""/><br /><sub><b>Aeidle</b></sub></a><br /></td>
+        <td align="center"><a href="https://github.com/achrafmataich"><img src="https://avatars.githubusercontent.com/u/100163733?&v=4" width="50;" style="border-radius: 25px;" alt=""/><br /><sub><b>achrafmataich</b></sub></a><br /></td>
+    </tr>
+</table>
+<!-- markdownlint-enable -->
+<!-- prettier-ignore-end -->
